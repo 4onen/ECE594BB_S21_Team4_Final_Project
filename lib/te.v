@@ -1,4 +1,5 @@
 `timescale 1ns/1ns
+// doi:10.1109/JSSC.2018.2883394
 module te(tin,din,tout);
 
     parameter BITS=3;
