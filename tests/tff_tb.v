@@ -1,21 +1,14 @@
 `timescale 1ns/100ps
 module tff_tb();
     reg rstb=1, WE=0, RE=0;
-    wire out, carry;
+    wire out;
 
-    tff DUT(WE,RE,rstb,out,carry);
+    tff DUT(WE,RE,rstb,out);
 
     initial begin
         $dumpfile(`OUTFILE);
         $dumpvars(0);
-        #1
-        rstb<=0;
-        RE<=1;
-        #8;
-        RE<=0;
         // Reset phase
-        rstb<=0;
-        #20;
         rstb<=1;
         #1;
         rstb<=0;
@@ -31,11 +24,14 @@ module tff_tb();
         WE<=1;
         #1;
         WE<=0;
-        #3;
+        #2;
 
         // Read phase
         RE<=1;
-        #20;
+        #5;
+        rstb<=0;
+        #1;
+        rstb<=1;
 
         $finish;
     end
