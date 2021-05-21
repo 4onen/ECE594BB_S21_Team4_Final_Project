@@ -19,6 +19,8 @@ module tff_tb();
         rstb<=1;
         #1;
         rstb<=0;
+        #1;
+        rstb<=1;
 
         // Write phase
         #1;
@@ -33,7 +35,7 @@ module tff_tb();
 
         // Read phase
         RE<=1;
-        #100;
+        #20;
 
         $finish;
     end

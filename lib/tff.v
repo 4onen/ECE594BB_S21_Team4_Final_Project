@@ -2,28 +2,32 @@
 //https://arch.library.northwestern.edu/downloads/2514nk901?locale=en
 module tff(WE,RE,rstb,out,carry);
     parameter BITS=3;
+    parameter RING_SEGS=2**BITS;
 
     input WE,RE,rstb;
     output out;
-    output reg carry;
+    output reg carry=0;
 
     wire EN = WE | RE;
     wire ring_ctrl = rstb & ~RE;
+    wire ring_loopback = (~carry & ~(ring_ctrl & out));
 
-    wire [(2**(BITS-1)):0] ring_vals;
-    genvar i;
-    generate
-        for (i=1;i<2**(BITS-1)+1;i=i+1)
-            tristate_buf b(ring_vals[i-1],EN,ring_vals[i]);
-    endgenerate
+    reg [RING_SEGS-1:0] ring;
+    
+    always @(posedge EN) begin
+        while(EN)
+            #1 ring <= {ring_loopback,ring[RING_SEGS-1:1]};
+    end
 
-    assign ring_vals[0] = (~carry & ~(ring_ctrl & out));
-    assign out = ring_vals[(2**(BITS-1))];
+    assign out=ring[0];
 
-    always @(posedge out)
-        if(~rstb)
+    always @(posedge ring[0])
+        if (~rstb)
             carry<=1;
-    always @(negedge rstb)
+    always @(negedge rstb) begin
         carry<=0;
+        ring<=0;
+    end
+
 
 endmodule
