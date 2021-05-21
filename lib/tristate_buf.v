@@ -3,10 +3,10 @@
 module tristate_buf(in,EN,out);
     input in;
     input EN;
-    output out;
+    output reg out;
 
-    wire mid;
-
-    assign mid = EN ? in : 1'bz;
-    unit_buffer b(mid,out);
+    always @(in or EN) begin
+        if(EN)
+            #1 if(EN) out=in;
+    end
 endmodule

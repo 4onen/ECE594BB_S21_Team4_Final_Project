@@ -9,27 +9,28 @@ module tristate_buf_tb();
         $dumpfile(`OUTFILE);
         $dumpvars(1);
 
-        in<=1'bx;
+        in<=1'b1;
         EN<=1'b0;
-        #0.9
-        if(out == 1'bz)
-            $error("FAIL: EN=0 caused out=z too quickly.");
-        #0.2
+        #1.1
         if(out != 1'bz)
-            $error("FAIL: EN=0 did not cause out=z.");
+            $error("FAIL: EN=0 caused in=out=1.");
+
+        EN<=1'b1; // Clear contents
+        #1.1
+        EN<=1'b0;
         
         in<=1'b0;
-        EN<=1;
+        EN<=1'b1;
         #0.9
-        if(out == 1'bz)
-            $error("FAIL: EN=0 caused in=out=0 too quickly.");
+        if(out == 1'b0)
+            $error("FAIL: EN=1 caused in=out=0 too quickly.");
         #0.2
         if(out != 1'b0)
             $error("FAIL: EN=1 did not pass in=0 to out");
         
         in<=1'b1;
         #0.9
-        if(out == 1'bz)
+        if(out == 1'b1)
             $error("FAIL: EN=0 caused in=out=1 too quickly.");
         #0.2
         if(out != 1'b1)
