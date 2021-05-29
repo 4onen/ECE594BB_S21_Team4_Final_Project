@@ -1,11 +1,13 @@
 `timescale 1ns/100ps
 module tff_tb();
+    parameter RING_SEGS=59;
+
     reg rstb=1, WE=0, RE=0;
     wire out;
     wire carry;
 
     tff DUT(WE,RE,rstb,out,carry);
-    defparam DUT.RING_SEGS=59;
+    defparam DUT.RING_SEGS=RING_SEGS;
 
     task write(input integer n); begin
         WE<=1;
@@ -27,18 +29,15 @@ module tff_tb();
         $dumpfile(`OUTFILE);
         $dumpvars(0);
         // Read phase
-        read(60);
+        read(RING_SEGS);
         #1;
 
         // Write phase
-        write(5);
-        write(7);
-        write(3);
-        write(0);
-        write(44);
+        write(8);
+        write(51);
 
         // Read phase
-        read(60);
+        read(RING_SEGS);
         #0;
         rstb<=0;
         #1;

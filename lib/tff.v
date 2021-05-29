@@ -1,4 +1,4 @@
-`timescale 1ns/100ps
+`timescale 1ns/10ps
 // https://arch.library.northwestern.edu/concern/generic_works/8k71nh39w?locale=en
 module tff(WE,RE,rstb,out,carry);
     parameter BITS=2;
@@ -15,17 +15,17 @@ module tff(WE,RE,rstb,out,carry);
     reg [RING_SEGS-1:0] ring;
     
     always @(posedge EN) begin
-        #0.1
-        while(EN & rstb) begin
+        #0.01;
+        while(EN) begin
             ring <= {ring_loopback,ring[RING_SEGS-1:1]};
             #1;
         end
     end
 
-    assign out=~ring[0];
+    assign out=~|{carry,ring[0]};
 
-    always @(posedge out) begin
-        if(rstb)
+    always @(negedge ring[0]) begin
+        if(rstb & ~RE)
             carry<=1'b1;
     end
 
