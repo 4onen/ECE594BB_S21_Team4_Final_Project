@@ -1,6 +1,6 @@
 `timescale 1ns/100ps
 module cmp_tb();
-    localparam BITS=3;
+    localparam BITS=2;
     localparam PERIOD=(2**BITS)+1;
 
     reg tin=0;
