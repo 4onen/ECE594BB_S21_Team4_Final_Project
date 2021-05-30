@@ -8,7 +8,7 @@ module iaf(
     input clk,
     input rstb,
     input latinhib_bus,
-    output spike
+    output reg spike
 );
 
     parameter INPUTS=25;
@@ -16,6 +16,8 @@ module iaf(
 
     wire [INPUTS-1:0] encoding_steps;
     assign encoding_steps[INPUTS-1] = clk;
+
+    wire carry;
 
     genvar i;
     generate
@@ -29,7 +31,13 @@ module iaf(
         end
     endgenerate
 
-    tff accum(.WE((~encoding_steps[0])&clk),.RE(latinhib_bus&~clk),.rstb(rstb),.carry(spike));
+    tff accum(.WE((~encoding_steps[0])&clk),.RE(latinhib_bus),.rstb(rstb),.carry(carry));
     defparam accum.RING_SEGS=VT;
+
+    always @(negedge clk)
+        spike<=carry;
+    
+    always @(posedge clk)
+        spike<=0;
 
 endmodule
