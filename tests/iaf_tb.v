@@ -1,43 +1,43 @@
 `timescale 1ns/100ps
 module iaf_tb();
-    parameter INPUTS=5;
-    parameter THRESH=5;
+    parameter INPUTS=25;
+    parameter THRESH=59;
+    parameter PERIOD=200;
 
     reg [INPUTS-1:0] weight_high_bits=0, weight_low_bits=0, signals=0;
     reg RE=0;
-    reg trig=0;
+    reg clk=0;
     reg rstb=1;
-    wire spike=0;
+    wire spike;
 
-    iaf DUT(weight_low_bits,weight_high_bits,signals,trig,RE,rstb,spike,spike);
+    iaf DUT(weight_low_bits,weight_high_bits,signals,clk,rstb,RE|spike,spike);
     defparam DUT.INPUTS=INPUTS;
     defparam DUT.VT=THRESH;
-
-    task read(input integer n); begin
-        RE<=1;
-        #(n);
-        RE<=0;
+    
+    initial forever begin
+        #(PERIOD/2);
+        clk<=0;
+        #(PERIOD/2-1);
         rstb<=0;
         #1;
         rstb<=1;
-    end endtask
+        clk<=1;
+    end
 
     initial begin
         $dumpfile(`OUTFILE);
         $dumpvars(3);
 
-        read(THRESH);
-        trig<=1;
-        #(THRESH);
-        trig<=0;
-        read(THRESH);
-        weight_high_bits<=~0;
-        weight_low_bits<=~0;
+        RE<=1;
+        #(PERIOD-1)
+        RE<=0;
+
+        weight_high_bits<=25'b11111;
+        weight_low_bits<=25'b11111;
         signals<=~0;
-        trig<=1;
-        #(THRESH);
-        trig<=0;
-        read(THRESH);
+        #1;
+
+        #(20*PERIOD);
 
         $finish;
     end
