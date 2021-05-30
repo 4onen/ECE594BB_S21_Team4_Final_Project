@@ -22,10 +22,10 @@ module tff(WE,RE,rstb,out,carry);
         end
     end
 
-    assign out=~|{carry,ring[0]};
+    assign out=~ring[0];
 
     always @(negedge ring[0]) begin
-        if(rstb & ~RE)
+        if(rstb)
             carry<=1'b1;
     end
 
