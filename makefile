@@ -8,7 +8,9 @@ tests: $(WAVES)
 clean:
 	rm -rf build waves
 
-.PHONY: clean tests
+netwaves: waves/v0.vcd waves/v1.vcd
+
+.PHONY: clean tests netwaves
 
 # This keeps us from regenerating executables, which
 #  saves us re-running tests we've already run.
@@ -39,3 +41,15 @@ endef
 
 $(eval $(foreach comp,$(COMPONENTS),$(call COMP_TEST_gen_template,$(comp))))
 
+
+# Build the network test file
+build/v%: net.v lib/iaf.v lib/tff.v lib/te.v lib/unit_buffer.v trained_weights.mem v%.mem build
+	iverilog -o$@ -ylib -Wall -DOUTFILE=\"waves/$(@F).vcd\" -DWEIGHTFILE=\"trained_weights.mem\" -DINPUTFILE=\"$(@F).mem\" $<
+
+# Translate the validation images
+v%.mem: v%.im seq_mem_gen.py
+	python3 seq_mem_gen.py $< $@
+
+# Run the network simulation
+waves/v%.vcd: build/v% v%.mem waves
+	./$<
