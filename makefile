@@ -10,7 +10,9 @@ clean:
 
 netwaves: waves/v0.vcd waves/v1.vcd
 
-.PHONY: clean tests netwaves
+activity_data: activities_v0.txt activities_v1.txt
+
+.PHONY: clean tests netwaves activity_data
 
 # This keeps us from regenerating executables, which
 #  saves us re-running tests we've already run.
@@ -53,3 +55,6 @@ v%.mem: v%.im seq_mem_gen.py
 # Run the network simulation
 waves/v%.vcd: build/v% v%.mem waves
 	./$<
+
+activities_v%.txt: waves/v%.vcd activities.py read_vcd.py
+	python3 activities.py $< >$@

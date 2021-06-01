@@ -2,3 +2,6 @@ build/*
 waves/*
 *.out
 *.vcd
+__pycache__
+.vscode
+*.txt
