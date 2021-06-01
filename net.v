@@ -41,7 +41,7 @@ module net();
 
     initial begin
         $dumpfile(`OUTFILE);
-        $dumpvars(2);
+        $dumpvars(0);
 
         $readmemb(`WEIGHTFILE,weightfile);
 

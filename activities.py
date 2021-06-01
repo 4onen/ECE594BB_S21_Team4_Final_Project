@@ -5,15 +5,17 @@ import numpy as np
 def bin_array(num,width:int):
     return np.array(list(np.binary_repr(num,width=width))).astype(bool)
 
-def signal_transitions(sig:Signal):
+def signal_transitions(sig:Signal,start_time=0,end_time=None):
     width:int = sig.width
     count:List[int] = np.zeros((sig.width,),dtype=np.uint32)
     
     lastval:str = bin_array(sig[0],width)[-width:]
 
     for tstep,val in sorted(sig._dat.items()):
+        if end_time is not None and tstep>end_time:
+            break
         valbin = bin_array(val,width)[-width:]
-        if tstep>=20000:
+        if tstep>=start_time:
             diffs = lastval^valbin
             count += diffs
         lastval = valbin
@@ -31,7 +33,9 @@ class Activities():
 
     def __init__(self,signals:VCD):
         self.translations = signals.translations
-        self._sigs = {k:signal_transitions(sig) for k,sig in signals._sigs.items()}
+        start_time = 20000 if 'net.rstb' in signals.translations.keys() else 22
+        end_time = None if 'net.rstb' in signals.translations.keys() else 104
+        self._sigs = {k:signal_transitions(sig,start_time) for k,sig in signals._sigs.items()}
     
     def __str__(self) -> str:
         return "Activities: {}".format(self.translations)
